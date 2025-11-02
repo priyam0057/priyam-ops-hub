@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
+import BackupButton from "@/components/project/BackupButton";
 import ProjectDetailsTab from "@/components/project/ProjectDetailsTab";
 import ProjectNotesTab from "@/components/project/ProjectNotesTab";
 import ProjectIssuesTab from "@/components/project/ProjectIssuesTab";
@@ -68,16 +69,23 @@ const ProjectDetail = () => {
   return (
     <div className="min-h-screen p-6">
       <div className="max-w-7xl mx-auto space-y-6">
-        <div className="flex items-center gap-4">
-          <Button variant="ghost" size="icon" onClick={() => navigate("/projects")}>
-            <ArrowLeft className="h-4 w-4" />
-          </Button>
-          <div>
-            <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              {project.project_name}
-            </h1>
-            <p className="text-muted-foreground mt-1">{project.description}</p>
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex items-center gap-4">
+            <Button variant="ghost" size="icon" onClick={() => navigate("/projects")}>
+              <ArrowLeft className="h-4 w-4" />
+            </Button>
+            <div>
+              <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+                {project.project_name}
+              </h1>
+              <p className="text-muted-foreground mt-1">{project.description}</p>
+            </div>
           </div>
+          <BackupButton 
+            projectId={project.id} 
+            projectName={project.project_name}
+            size="lg"
+          />
         </div>
 
         <Card>

@@ -5,8 +5,9 @@ import { User } from "@supabase/supabase-js";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
-import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
-import { Plus, FolderKanban, LogOut } from "lucide-react";
+import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
+import { Plus, FolderKanban, LogOut, Code2, Calendar, TrendingUp } from "lucide-react";
+import BackupButton from "@/components/project/BackupButton";
 
 interface Project {
   id: string;
@@ -14,6 +15,8 @@ interface Project {
   status: string;
   description: string;
   updated_at: string;
+  technology_stack: string[];
+  start_date: string | null;
 }
 
 const Dashboard = () => {
@@ -82,6 +85,21 @@ const Dashboard = () => {
 
   const COLORS = ['hsl(var(--chart-1))', 'hsl(var(--chart-2))', 'hsl(var(--chart-3))', 'hsl(var(--chart-4))', 'hsl(var(--chart-5))'];
 
+  // Calculate technology statistics
+  const techStats = projects.reduce((acc: Record<string, number>, project) => {
+    if (project.technology_stack) {
+      project.technology_stack.forEach((tech: string) => {
+        acc[tech] = (acc[tech] || 0) + 1;
+      });
+    }
+    return acc;
+  }, {});
+
+  const techData = Object.entries(techStats)
+    .map(([name, value]) => ({ name, value }))
+    .sort((a, b) => b.value - a.value)
+    .slice(0, 8);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
@@ -106,8 +124,55 @@ const Dashboard = () => {
           </Button>
         </div>
 
+        <div className="grid gap-6 md:grid-cols-3">
+          <Card className="bg-gradient-to-br from-primary/10 to-primary/5 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <FolderKanban className="h-5 w-5 text-primary" />
+                Total Projects
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-4xl font-bold text-primary">{projects.length}</p>
+              <p className="text-sm text-muted-foreground mt-1">Active projects</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-accent/10 to-accent/5 border-accent/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Code2 className="h-5 w-5 text-accent" />
+                Technologies
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-4xl font-bold text-accent">{Object.keys(techStats).length}</p>
+              <p className="text-sm text-muted-foreground mt-1">Different tech stacks</p>
+            </CardContent>
+          </Card>
+
+          <Card className="bg-gradient-to-br from-chart-2/10 to-chart-2/5 border-chart-2/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <TrendingUp className="h-5 w-5" style={{ color: 'hsl(var(--chart-2))' }} />
+                This Month
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-4xl font-bold" style={{ color: 'hsl(var(--chart-2))' }}>
+                {projects.filter(p => {
+                  const updatedDate = new Date(p.updated_at);
+                  const now = new Date();
+                  return updatedDate.getMonth() === now.getMonth() && updatedDate.getFullYear() === now.getFullYear();
+                }).length}
+              </p>
+              <p className="text-sm text-muted-foreground mt-1">Updated projects</p>
+            </CardContent>
+          </Card>
+        </div>
+
         <div className="grid md:grid-cols-2 gap-6">
-          <Card>
+          <Card className="shadow-lg">
             <CardHeader>
               <CardTitle>Project Status Overview</CardTitle>
               <CardDescription>Distribution of projects by status</CardDescription>
@@ -140,32 +205,86 @@ const Dashboard = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card className="shadow-lg">
+            <CardHeader>
+              <CardTitle>Technology Usage</CardTitle>
+              <CardDescription>Most used technologies across projects</CardDescription>
+            </CardHeader>
+            <CardContent>
+              {techData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart data={techData}>
+                    <CartesianGrid strokeDasharray="3 3" opacity={0.1} />
+                    <XAxis dataKey="name" tick={{ fontSize: 12 }} angle={-45} textAnchor="end" height={80} />
+                    <YAxis />
+                    <Tooltip />
+                    <Bar dataKey="value" fill="hsl(var(--primary))" radius={[8, 8, 0, 0]} />
+                  </BarChart>
+                </ResponsiveContainer>
+              ) : (
+                <p className="text-center text-muted-foreground py-12">No technology data yet</p>
+              )}
+            </CardContent>
+          </Card>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-6">
+          <Card className="shadow-lg">
             <CardHeader>
               <CardTitle>Quick Actions</CardTitle>
               <CardDescription>Get started with your projects</CardDescription>
             </CardHeader>
             <CardContent className="space-y-3">
               <Button 
-                className="w-full justify-start" 
+                className="w-full justify-start h-12 font-semibold" 
                 onClick={() => navigate("/projects")}
               >
-                <FolderKanban className="mr-2 h-4 w-4" />
+                <FolderKanban className="mr-2 h-5 w-5" />
                 View All Projects
               </Button>
               <Button 
-                className="w-full justify-start"
+                className="w-full justify-start h-12 font-semibold"
                 variant="secondary"
                 onClick={() => navigate("/projects/new")}
               >
-                <Plus className="mr-2 h-4 w-4" />
+                <Plus className="mr-2 h-5 w-5" />
                 Create New Project
               </Button>
             </CardContent>
           </Card>
+
+          <Card className="shadow-lg bg-gradient-to-br from-primary/5 to-accent/5 border-primary/20">
+            <CardHeader>
+              <CardTitle className="flex items-center gap-2">
+                <Calendar className="h-5 w-5 text-primary" />
+                Project Timeline
+              </CardTitle>
+              <CardDescription>Upcoming milestones and deadlines</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-3">
+                {projects.slice(0, 3).map((project) => (
+                  <div key={project.id} className="flex items-center justify-between p-3 rounded-lg bg-background/50 border border-primary/10">
+                    <div>
+                      <p className="font-medium text-sm">{project.project_name}</p>
+                      <p className="text-xs text-muted-foreground">
+                        {project.start_date ? new Date(project.start_date).toLocaleDateString() : "No start date"}
+                      </p>
+                    </div>
+                    <span className="text-xs px-3 py-1 rounded-full bg-primary/20 text-primary font-medium">
+                      {project.status}
+                    </span>
+                  </div>
+                ))}
+                {projects.length === 0 && (
+                  <p className="text-center text-muted-foreground py-6 text-sm">No projects to display</p>
+                )}
+              </div>
+            </CardContent>
+          </Card>
         </div>
 
-        <Card>
+        <Card className="shadow-lg">
           <CardHeader>
             <CardTitle>Recent Activity</CardTitle>
             <CardDescription>Your 5 most recently updated projects</CardDescription>
@@ -176,15 +295,22 @@ const Dashboard = () => {
                 {projects.slice(0, 5).map((project) => (
                   <div
                     key={project.id}
-                    className="flex items-center justify-between p-4 bg-muted rounded-lg cursor-pointer hover:bg-muted/70 transition-colors"
+                    className="flex items-center justify-between p-4 bg-gradient-to-r from-muted to-muted/50 rounded-lg cursor-pointer hover:from-muted/80 hover:to-muted/40 transition-all duration-200 border border-primary/10"
                     onClick={() => navigate(`/projects/${project.id}`)}
                   >
                     <div className="flex-1">
-                      <h3 className="font-semibold">{project.project_name}</h3>
-                      <p className="text-sm text-muted-foreground">{project.description || "No description"}</p>
+                      <h3 className="font-semibold text-base">{project.project_name}</h3>
+                      <p className="text-sm text-muted-foreground mt-1">{project.description || "No description"}</p>
                     </div>
-                    <div className="text-right">
-                      <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary">
+                    <div className="flex items-center gap-2">
+                      <BackupButton 
+                        projectId={project.id} 
+                        projectName={project.project_name}
+                        variant="ghost"
+                        size="icon"
+                        showLabel={false}
+                      />
+                      <span className="text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground font-medium">
                         {project.status}
                       </span>
                     </div>

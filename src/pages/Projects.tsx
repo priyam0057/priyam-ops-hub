@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Plus, ArrowLeft, ExternalLink } from "lucide-react";
+import BackupButton from "@/components/project/BackupButton";
 
 interface Project {
   id: string;
@@ -74,13 +75,13 @@ const Projects = () => {
           {projects.map((project) => (
             <Card 
               key={project.id} 
-              className="cursor-pointer hover:shadow-lg transition-all hover:border-primary/50"
+              className="cursor-pointer hover:shadow-xl transition-all hover:border-primary/50 bg-gradient-to-br from-card to-card/50"
               onClick={() => navigate(`/projects/${project.id}`)}
             >
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-xl">{project.project_name}</CardTitle>
-                  <span className="text-xs px-2 py-1 rounded-full bg-primary/20 text-primary">
+                  <span className="text-xs px-3 py-1.5 rounded-full bg-primary text-primary-foreground font-medium">
                     {project.status}
                   </span>
                 </div>
@@ -90,20 +91,20 @@ const Projects = () => {
               </CardHeader>
               <CardContent className="space-y-3">
                 {project.technology_stack && project.technology_stack.length > 0 && (
-                  <div className="flex flex-wrap gap-1">
+                  <div className="flex flex-wrap gap-1.5">
                     {project.technology_stack.slice(0, 3).map((tech, i) => (
-                      <span key={i} className="text-xs px-2 py-1 bg-muted rounded">
+                      <span key={i} className="text-xs px-2.5 py-1 bg-accent/20 text-accent rounded-md font-medium">
                         {tech}
                       </span>
                     ))}
                     {project.technology_stack.length > 3 && (
-                      <span className="text-xs px-2 py-1 bg-muted rounded">
+                      <span className="text-xs px-2.5 py-1 bg-accent/20 text-accent rounded-md font-medium">
                         +{project.technology_stack.length - 3}
                       </span>
                     )}
                   </div>
                 )}
-                <div className="flex gap-2">
+                <div className="flex gap-2 pt-2">
                   {project.repo_link && (
                     <Button 
                       size="sm" 
@@ -130,6 +131,15 @@ const Projects = () => {
                       Live
                     </Button>
                   )}
+                  <div onClick={(e) => e.stopPropagation()}>
+                    <BackupButton 
+                      projectId={project.id} 
+                      projectName={project.project_name}
+                      variant="ghost"
+                      size="sm"
+                      showLabel={false}
+                    />
+                  </div>
                 </div>
               </CardContent>
             </Card>
