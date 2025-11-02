@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { useToast } from "@/hooks/use-toast";
 import { ArrowLeft } from "lucide-react";
 import BackupButton from "@/components/project/BackupButton";
+import GoogleDriveManager from "@/components/project/GoogleDriveManager";
 import ProjectDetailsTab from "@/components/project/ProjectDetailsTab";
 import ProjectNotesTab from "@/components/project/ProjectNotesTab";
 import ProjectIssuesTab from "@/components/project/ProjectIssuesTab";
@@ -129,6 +130,8 @@ const ProjectDetail = () => {
             </Tabs>
           </CardContent>
         </Card>
+
+        <GoogleDriveManager projectId={project.id} projectName={project.project_name} />
       </div>
     </div>
   );
