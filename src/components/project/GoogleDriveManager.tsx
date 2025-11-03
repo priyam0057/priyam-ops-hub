@@ -37,31 +37,32 @@ const GoogleDriveManager = ({ projectId, projectName }: GoogleDriveManagerProps)
       setIsAuthenticated(true);
       fetchFiles(token);
     }
-  }, []);
 
-  const handleGoogleAuth = () => {
-    const redirectUri = window.location.origin;
-    const scope = 'https://www.googleapis.com/auth/drive.file';
-    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${redirectUri}&response_type=token&scope=${scope}`;
-    
-    // Open popup for authentication
-    const popup = window.open(authUrl, 'Google Auth', 'width=500,height=600');
-    
-    // Listen for the access token
-    window.addEventListener('message', (event) => {
-      if (event.data.type === 'google-auth') {
-        const token = event.data.token;
-        localStorage.setItem('google_drive_token', token);
-        setAccessToken(token);
+    // Handle OAuth redirect
+    const hash = window.location.hash;
+    if (hash) {
+      const params = new URLSearchParams(hash.substring(1));
+      const accessToken = params.get('access_token');
+      if (accessToken) {
+        localStorage.setItem('google_drive_token', accessToken);
+        setAccessToken(accessToken);
         setIsAuthenticated(true);
-        fetchFiles(token);
-        popup?.close();
+        fetchFiles(accessToken);
+        window.history.replaceState({}, document.title, window.location.pathname);
         toast({
           title: "Connected",
           description: "Successfully connected to Google Drive"
         });
       }
-    });
+    }
+  }, []);
+
+  const handleGoogleAuth = () => {
+    const redirectUri = window.location.origin + '/dashboard';
+    const scope = 'https://www.googleapis.com/auth/drive.file';
+    const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=token&scope=${encodeURIComponent(scope)}&prompt=consent`;
+    
+    window.location.href = authUrl;
   };
 
   const fetchFiles = async (token: string) => {

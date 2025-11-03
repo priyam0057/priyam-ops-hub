@@ -36,8 +36,10 @@ This guide will help you set up Google Drive integration for backing up your pro
    - Name: Priyam Dashboard
    - Authorized JavaScript origins: Add your app URL
      - For development: `http://localhost:5173`
-     - For production: Your deployed URL (e.g., `https://your-app.lovable.app`)
-   - Authorized redirect URIs: Same as JavaScript origins
+     - For production: Your deployed URL (e.g., `https://0f252b7b-428f-4c67-85b2-c510cf391593.lovableproject.com`)
+   - Authorized redirect URIs: **MUST include /dashboard**
+     - For development: `http://localhost:5173/dashboard`
+     - For production: `https://0f252b7b-428f-4c67-85b2-c510cf391593.lovableproject.com/dashboard`
    - Click "Create"
 
 5. Copy the **Client ID** (you'll need this)
@@ -71,9 +73,13 @@ Once connected, you can:
 
 ## Troubleshooting
 
-### "Access blocked" error
-- Make sure you've added your app's URL to "Authorized JavaScript origins"
-- Check that the OAuth consent screen is properly configured
+### "Access blocked" or "redirect_uri_mismatch" error
+- Go to Google Cloud Console → Credentials
+- Edit your OAuth 2.0 Client ID
+- Add the EXACT redirect URI with `/dashboard` at the end:
+  - Example: `https://0f252b7b-428f-4c67-85b2-c510cf391593.lovableproject.com/dashboard`
+- Make sure the URL matches your current app URL exactly
+- Save and try connecting again
 
 ### "Invalid client ID" error
 - Verify the Client ID is correctly copied to `.env`
