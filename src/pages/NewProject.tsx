@@ -8,21 +8,34 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ArrowLeft } from "lucide-react";
+import { ArrowLeft, X, Plus } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 const NewProject = () => {
   const [loading, setLoading] = useState(false);
+  const [technologies, setTechnologies] = useState<string[]>([]);
+  const [currentTech, setCurrentTech] = useState("");
   const [formData, setFormData] = useState({
     project_name: "",
     description: "",
     status: "Planning",
     start_date: "",
-    technology_stack: "",
     repo_link: "",
     live_link: ""
   });
   const navigate = useNavigate();
   const { toast } = useToast();
+
+  const handleAddTechnology = () => {
+    if (currentTech.trim() && !technologies.includes(currentTech.trim())) {
+      setTechnologies([...technologies, currentTech.trim()]);
+      setCurrentTech("");
+    }
+  };
+
+  const handleRemoveTechnology = (tech: string) => {
+    setTechnologies(technologies.filter(t => t !== tech));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -39,11 +52,6 @@ const NewProject = () => {
       return;
     }
 
-    const techStack = formData.technology_stack
-      .split(",")
-      .map(tech => tech.trim())
-      .filter(tech => tech.length > 0);
-
     const { data, error } = await supabase
       .from("projects")
       .insert({
@@ -52,7 +60,7 @@ const NewProject = () => {
         description: formData.description,
         status: formData.status,
         start_date: formData.start_date || null,
-        technology_stack: techStack,
+        technology_stack: technologies,
         repo_link: formData.repo_link || null,
         live_link: formData.live_link || null
       })
@@ -145,13 +153,32 @@ const NewProject = () => {
               </div>
 
               <div className="space-y-2">
-                <Label htmlFor="technology_stack">Technology Stack (comma-separated)</Label>
-                <Input
-                  id="technology_stack"
-                  placeholder="React, Node.js, PostgreSQL"
-                  value={formData.technology_stack}
-                  onChange={(e) => setFormData({ ...formData, technology_stack: e.target.value })}
-                />
+                <Label htmlFor="technology_stack">Technology Stack</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="technology_stack"
+                    placeholder="e.g., React, Node.js, PostgreSQL"
+                    value={currentTech}
+                    onChange={(e) => setCurrentTech(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && (e.preventDefault(), handleAddTechnology())}
+                  />
+                  <Button type="button" onClick={handleAddTechnology} size="icon">
+                    <Plus className="h-4 w-4" />
+                  </Button>
+                </div>
+                {technologies.length > 0 && (
+                  <div className="flex flex-wrap gap-2 mt-2">
+                    {technologies.map((tech) => (
+                      <Badge key={tech} variant="secondary" className="gap-1">
+                        {tech}
+                        <X
+                          className="h-3 w-3 cursor-pointer hover:text-destructive"
+                          onClick={() => handleRemoveTechnology(tech)}
+                        />
+                      </Badge>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="grid md:grid-cols-2 gap-4">
