@@ -66,9 +66,9 @@ const ProjectDetail = () => {
         goals: goalsRes.data || []
       };
 
-      const pdfContent = generateProjectPDF(projectData);
-      const base64Content = btoa(pdfContent);
-      const fileName = `${project.project_name.replace(/\s+/g, "-")}-details-${new Date().toISOString().split("T")[0]}.txt`;
+      const pdfDataUri = generateProjectPDF(projectData);
+      const base64Content = pdfDataUri.split(',')[1];
+      const fileName = `${project.project_name.replace(/\s+/g, "-")}-details-${new Date().toISOString().split("T")[0]}.pdf`;
 
       const { error } = await supabase.functions.invoke('google-drive', {
         body: { 
@@ -185,7 +185,7 @@ const ProjectDetail = () => {
               className="gap-2"
             >
               <FileText className="h-4 w-4" />
-              Quick Backup (JSON)
+              Quick Backup (PDF)
             </Button>
             <Button 
               variant="outline"
