@@ -3,6 +3,7 @@ import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { Download, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
+import { generateProjectPDF } from "@/lib/pdfGenerator";
 
 interface BackupButtonProps {
   projectId: string;
@@ -38,16 +39,14 @@ const BackupButton = ({ projectId, projectName, variant = "outline", size = "def
         version: "1.0"
       };
 
-      // Create and download JSON file
-      const blob = new Blob([JSON.stringify(backupData, null, 2)], { type: "application/json" });
-      const url = URL.createObjectURL(blob);
+      // Generate and download PDF
+      const pdfDataUri = generateProjectPDF(backupData);
       const link = document.createElement("a");
-      link.href = url;
-      link.download = `${projectName.replace(/\s+/g, "-")}-backup-${new Date().toISOString().split("T")[0]}.json`;
+      link.href = pdfDataUri;
+      link.download = `${projectName.replace(/\s+/g, "-")}-backup-${new Date().toISOString().split("T")[0]}.pdf`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      URL.revokeObjectURL(url);
 
       toast({
         title: "Backup Created",
