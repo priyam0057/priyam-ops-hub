@@ -172,7 +172,6 @@ const ProjectDetail = () => {
           <div className="flex flex-wrap gap-2 ml-14">
             <Button 
               onClick={() => setBackupsDialogOpen(true)}
-              disabled={!accessToken}
               className="gap-2"
             >
               <FolderArchive className="h-4 w-4" />
@@ -180,7 +179,6 @@ const ProjectDetail = () => {
             </Button>
             <Button 
               onClick={handleQuickBackup}
-              disabled={!accessToken}
               variant="outline"
               className="gap-2"
             >
@@ -255,15 +253,13 @@ const ProjectDetail = () => {
           </TabsContent>
         </Tabs>
 
-        {accessToken && (
-          <ManageBackupsDialog
-            open={backupsDialogOpen}
-            onOpenChange={setBackupsDialogOpen}
-            projectId={project.id}
-            projectName={project.project_name}
-            accessToken={accessToken}
-          />
-        )}
+        <ManageBackupsDialog
+          open={backupsDialogOpen}
+          onOpenChange={setBackupsDialogOpen}
+          projectId={project.id}
+          projectName={project.project_name}
+          accessToken={accessToken || ''}
+        />
       </div>
     </div>
   );

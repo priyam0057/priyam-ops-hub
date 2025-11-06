@@ -6,9 +6,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { useToast } from "@/hooks/use-toast";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Bar, XAxis, YAxis, CartesianGrid } from "recharts";
-import { Plus, FolderKanban, LogOut, Code2, Calendar, TrendingUp, Cloud } from "lucide-react";
+import { Plus, FolderKanban, LogOut, Code2, Calendar, TrendingUp } from "lucide-react";
 import BackupButton from "@/components/project/BackupButton";
-import GoogleDriveManager from "@/components/project/GoogleDriveManager";
+import { GoogleDriveConnect } from "@/components/GoogleDriveConnect";
 
 interface Project {
   id: string;
@@ -324,9 +324,7 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        {projects.length > 0 && (
-          <GoogleDriveManager projectId={projects[0].id} projectName={projects[0].project_name} />
-        )}
+        <GoogleDriveConnect />
       </div>
     </div>
   );
