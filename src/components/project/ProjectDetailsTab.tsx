@@ -6,7 +6,7 @@ import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { useToast } from "@/hooks/use-toast";
-import { ExternalLink, Save } from "lucide-react";
+import { ExternalLink, Save, Edit } from "lucide-react";
 
 interface Project {
   id: string;
@@ -76,7 +76,14 @@ const ProjectDetailsTab = ({ project, onUpdate }: Props) => {
     return (
       <div className="space-y-6 py-4">
         <div className="flex justify-end">
-          <Button onClick={() => setEditing(true)}>Edit Details</Button>
+          <Button 
+            onClick={() => setEditing(true)}
+            className="gap-2 shadow-lg hover:shadow-xl transition-all"
+            size="lg"
+          >
+            <Edit className="h-4 w-4" />
+            Edit Details
+          </Button>
         </div>
         
         <div className="grid md:grid-cols-2 gap-6">
@@ -134,31 +141,40 @@ const ProjectDetailsTab = ({ project, onUpdate }: Props) => {
   }
 
   return (
-    <div className="space-y-4 py-4">
+    <div className="space-y-6 py-4">
+      <div className="bg-gradient-to-r from-primary/5 to-accent/5 border border-primary/20 rounded-lg p-4">
+        <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+          <Edit className="h-5 w-5 text-primary" />
+          Edit Project Details
+        </h3>
+      </div>
+      
       <div className="space-y-2">
-        <Label htmlFor="edit_project_name">Project Name</Label>
+        <Label htmlFor="edit_project_name" className="text-sm font-medium">Project Name</Label>
         <Input
           id="edit_project_name"
           value={formData.project_name}
           onChange={(e) => setFormData({ ...formData, project_name: e.target.value })}
+          className="border-primary/20 focus:border-primary"
         />
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="edit_description">Description</Label>
+        <Label htmlFor="edit_description" className="text-sm font-medium">Description</Label>
         <Textarea
           id="edit_description"
           value={formData.description}
           onChange={(e) => setFormData({ ...formData, description: e.target.value })}
           rows={4}
+          className="border-primary/20 focus:border-primary"
         />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="edit_status">Status</Label>
+          <Label htmlFor="edit_status" className="text-sm font-medium">Status</Label>
           <Select value={formData.status} onValueChange={(value) => setFormData({ ...formData, status: value })}>
-            <SelectTrigger>
+            <SelectTrigger className="border-primary/20 focus:border-primary">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -173,53 +189,68 @@ const ProjectDetailsTab = ({ project, onUpdate }: Props) => {
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="edit_start_date">Start Date</Label>
+          <Label htmlFor="edit_start_date" className="text-sm font-medium">Start Date</Label>
           <Input
             id="edit_start_date"
             type="date"
             value={formData.start_date}
             onChange={(e) => setFormData({ ...formData, start_date: e.target.value })}
+            className="border-primary/20 focus:border-primary"
           />
         </div>
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="edit_technology_stack">Technology Stack (comma-separated)</Label>
+        <Label htmlFor="edit_technology_stack" className="text-sm font-medium">Technology Stack (comma-separated)</Label>
         <Input
           id="edit_technology_stack"
           value={formData.technology_stack}
           onChange={(e) => setFormData({ ...formData, technology_stack: e.target.value })}
+          placeholder="React, Node.js, PostgreSQL"
+          className="border-primary/20 focus:border-primary"
         />
       </div>
 
       <div className="grid md:grid-cols-2 gap-4">
         <div className="space-y-2">
-          <Label htmlFor="edit_repo_link">Repository Link</Label>
+          <Label htmlFor="edit_repo_link" className="text-sm font-medium">Repository Link</Label>
           <Input
             id="edit_repo_link"
             type="url"
             value={formData.repo_link}
             onChange={(e) => setFormData({ ...formData, repo_link: e.target.value })}
+            placeholder="https://github.com/user/repo"
+            className="border-primary/20 focus:border-primary"
           />
         </div>
 
         <div className="space-y-2">
-          <Label htmlFor="edit_live_link">Live Link</Label>
+          <Label htmlFor="edit_live_link" className="text-sm font-medium">Live Link</Label>
           <Input
             id="edit_live_link"
             type="url"
             value={formData.live_link}
             onChange={(e) => setFormData({ ...formData, live_link: e.target.value })}
+            placeholder="https://example.com"
+            className="border-primary/20 focus:border-primary"
           />
         </div>
       </div>
 
-      <div className="flex gap-3 pt-4">
-        <Button onClick={handleSave}>
-          <Save className="mr-2 h-4 w-4" />
+      <div className="flex gap-3 pt-6 border-t border-border">
+        <Button 
+          onClick={handleSave}
+          className="gap-2 shadow-md hover:shadow-lg transition-all"
+          size="lg"
+        >
+          <Save className="h-4 w-4" />
           Save Changes
         </Button>
-        <Button variant="outline" onClick={() => setEditing(false)}>
+        <Button 
+          variant="outline" 
+          onClick={() => setEditing(false)}
+          size="lg"
+        >
           Cancel
         </Button>
       </div>
