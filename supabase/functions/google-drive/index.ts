@@ -14,7 +14,7 @@ serve(async (req) => {
 
   switch (action) {
     case 'get-auth-url': {
-      const clientId = Deno.env.get('VITE_GOOGLE_DRIVE_CLIENT_ID');
+      const clientId = Deno.env.get('GOOGLE_DRIVE_CLIENT_ID');
       const redirectUri = `${req.headers.get('origin')}/`;
       const scope = 'https://www.googleapis.com/auth/drive.file';
       
@@ -26,7 +26,7 @@ serve(async (req) => {
     }
 
     case 'exchange-token': {
-      const clientId = Deno.env.get('VITE_GOOGLE_DRIVE_CLIENT_ID');
+      const clientId = Deno.env.get('GOOGLE_DRIVE_CLIENT_ID');
       const clientSecret = Deno.env.get('GOOGLE_DRIVE_CLIENT_SECRET');
       const redirectUri = `${req.headers.get('origin')}/`;
       
