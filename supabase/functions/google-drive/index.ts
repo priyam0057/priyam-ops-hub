@@ -10,9 +10,47 @@ serve(async (req) => {
     return new Response('ok', { headers: corsHeaders });
   }
 
-  const { action, accessToken, fileId, fileName, fileContent, projectName, folderName } = await req.json();
+  const { action, accessToken, fileId, fileName, fileContent, projectName, folderName, code } = await req.json();
 
   switch (action) {
+    case 'get-auth-url': {
+      const clientId = Deno.env.get('VITE_GOOGLE_DRIVE_CLIENT_ID');
+      const redirectUri = `${req.headers.get('origin')}/`;
+      const scope = 'https://www.googleapis.com/auth/drive.file';
+      
+      const authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${clientId}&redirect_uri=${encodeURIComponent(redirectUri)}&response_type=code&scope=${encodeURIComponent(scope)}&state=google_drive_auth&access_type=offline&prompt=consent`;
+      
+      return new Response(JSON.stringify({ authUrl }), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
+    case 'exchange-token': {
+      const clientId = Deno.env.get('VITE_GOOGLE_DRIVE_CLIENT_ID');
+      const clientSecret = Deno.env.get('GOOGLE_DRIVE_CLIENT_SECRET');
+      const redirectUri = `${req.headers.get('origin')}/`;
+      
+      const tokenResponse = await fetch('https://oauth2.googleapis.com/token', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: new URLSearchParams({
+          code: code,
+          client_id: clientId!,
+          client_secret: clientSecret!,
+          redirect_uri: redirectUri,
+          grant_type: 'authorization_code',
+        }),
+      });
+
+      const tokenData = await tokenResponse.json();
+      
+      return new Response(JSON.stringify(tokenData), {
+        headers: { ...corsHeaders, 'Content-Type': 'application/json' }
+      });
+    }
+
     case 'list': {
       // Determine folder hierarchy: Priyam Backups / [Project Name or folderName]
       const targetFolder = folderName || projectName || 'Priyam Backups';
