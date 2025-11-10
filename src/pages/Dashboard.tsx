@@ -9,6 +9,8 @@ import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip, BarChart, Ba
 import { Plus, FolderKanban, LogOut, Code2, Calendar, TrendingUp } from "lucide-react";
 import BackupButton from "@/components/project/BackupButton";
 import { GoogleDriveConnect } from "@/components/GoogleDriveConnect";
+import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
+import { AppSidebar } from "@/components/AppSidebar";
 
 interface Project {
   id: string;
@@ -24,6 +26,7 @@ const Dashboard = () => {
   const [user, setUser] = useState<User | null>(null);
   const [projects, setProjects] = useState<Project[]>([]);
   const [loading, setLoading] = useState(true);
+  const [isAdmin, setIsAdmin] = useState(false);
   const navigate = useNavigate();
   const { toast } = useToast();
 
@@ -66,6 +69,16 @@ const Dashboard = () => {
     } else {
       setProjects(data || []);
     }
+
+    if (user) {
+      const { data: roles } = await supabase
+        .from("user_roles")
+        .select("role")
+        .eq("user_id", user.id);
+
+      setIsAdmin(roles?.some(r => r.role === "admin") || false);
+    }
+
     setLoading(false);
   };
 
@@ -110,8 +123,15 @@ const Dashboard = () => {
   }
 
   return (
-    <div className="min-h-screen p-6">
-      <div className="max-w-7xl mx-auto space-y-6">
+    <SidebarProvider>
+      <div className="min-h-screen flex w-full">
+        <AppSidebar isAdmin={isAdmin} />
+        <div className="flex-1 flex flex-col">
+          <header className="h-14 border-b flex items-center px-4 gap-2">
+            <SidebarTrigger />
+          </header>
+          <main className="flex-1 p-6">
+            <div className="max-w-7xl mx-auto space-y-6">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-4xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
@@ -324,9 +344,12 @@ const Dashboard = () => {
           </CardContent>
         </Card>
 
-        <GoogleDriveConnect />
+              <GoogleDriveConnect />
+            </div>
+          </main>
+        </div>
       </div>
-    </div>
+    </SidebarProvider>
   );
 };
 
